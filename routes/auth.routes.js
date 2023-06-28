@@ -69,7 +69,54 @@ router.post("/signup", (req, res, next) => {
     });
 });
 
+//LOGIN METHOD//
+
+// GET route ==> to display the login form to users
+router.get("/login", (req, res) => res.render("auth/login"));
+
+// POST login route ==> to process form data
+router.post("/login", (req, res, next) => {
+  const { email, password } = req.body;
+
+  if (email === "" || password === "") {
+    res.render("auth/login", {
+      errorMessage: "Please enter both, email and password to login.",
+    });
+    return;
+  }
+
+  User.findOne({ email }) // <== check if there's user with the provided email
+    .then((user) => {
+      // <== "user" here is just a placeholder and represents the response from the DB
+      if (!user) {
+        // <== if there's no user with provided email, notify the user who is trying to login
+        console.log("Email not registered. ");
+        res.render("auth/login", {
+          errorMessage: "User not found and/or incorrect password.",
+        });
+        return;
+      }
+      // if there's a user, compare provided password
+      // with the hashed password saved in the database
+      else if (bcryptjs.compareSync(password, user.password)) {
+        // if the two passwords match, render the user-profile.hbs and
+        //                   pass the user object to this view
+        //                                 |
+        //                                 V
+        res.render("users/user-profile", { user });
+      } else {
+        // if the two passwords DON'T match, render the login form again
+        // and send the error message to the user
+        console.log("Incorrect password. ");
+        res.render("auth/login", {
+          errorMessage: "User not found and/or incorrect password.",
+        });
+      }
+    })
+    .catch((error) => next(error));
+});
+
 //GET INFO TO DISPLAY USER PROFILE
-router.get("/userProfile", (req, res) => res.render("users/user-profile"));
+router.get("/userProfile", (req, res) => res.render("users/user-profile.hbs"));
 
 module.exports = router;
