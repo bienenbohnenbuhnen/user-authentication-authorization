@@ -76,6 +76,7 @@ router.get("/login", (req, res) => res.render("auth/login"));
 
 // POST login route ==> to process form data
 router.post("/login", (req, res, next) => {
+  console.log("SESSION =====> ", req.session);
   const { email, password } = req.body;
 
   if (email === "" || password === "") {
@@ -102,8 +103,9 @@ router.post("/login", (req, res, next) => {
         // if the two passwords match, render the user-profile.hbs and
         //                   pass the user object to this view
         //                                 |
-        //                                 V
-        res.render("users/user-profile", { user });
+        //******* SAVE THE USER IN THE SESSION ********//
+        req.session.currentUser = user;
+        res.redirect("/userProfile");
       } else {
         // if the two passwords DON'T match, render the login form again
         // and send the error message to the user
@@ -117,6 +119,16 @@ router.post("/login", (req, res, next) => {
 });
 
 //GET INFO TO DISPLAY USER PROFILE
-router.get("/userProfile", (req, res) => res.render("users/user-profile.hbs"));
+router.get("/userProfile", (req, res) => {
+  res.render("users/user-profile", { userInSession: req.session.currentUser });
+});
+
+//LOG THE USER OUT
+router.post("/logout", (req, res, next) => {
+  req.session.destroy((err) => {
+    if (err) next(err);
+    res.redirect("/");
+  });
+});
 
 module.exports = router;

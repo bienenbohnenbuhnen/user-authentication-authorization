@@ -41,7 +41,7 @@ form button {
   cursor: pointer;
   display: inline-block;
   font-size: 14px;
-  padding: 8px 16px;
+  padding: 4px 4px;
   text-decoration: none;
   text-transform: uppercase;
   transition: 0.3s ease background;
