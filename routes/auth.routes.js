@@ -2,12 +2,13 @@ const express = require("express");
 const router = express.Router();
 const User = require("../models/User.model");
 const mongoose = require("mongoose");
+const { isLoggedIn, isLoggedOut } = require("../middleware/route-guard.js");
 
 const bcryptjs = require("bcryptjs");
 const saltRounds = 10;
 
 /* GET home page */
-router.get("/signup", (req, res, next) => {
+router.get("/signup", isLoggedOut, (req, res, next) => {
   res.render("auth/signup");
 });
 
@@ -72,7 +73,7 @@ router.post("/signup", (req, res, next) => {
 //LOGIN METHOD//
 
 // GET route ==> to display the login form to users
-router.get("/login", (req, res) => res.render("auth/login"));
+router.get("/login", isLoggedOut, (req, res) => res.render("auth/login"));
 
 // POST login route ==> to process form data
 router.post("/login", (req, res, next) => {
@@ -119,7 +120,7 @@ router.post("/login", (req, res, next) => {
 });
 
 //GET INFO TO DISPLAY USER PROFILE
-router.get("/userProfile", (req, res) => {
+router.get("/userProfile", isLoggedIn, (req, res) => {
   res.render("users/user-profile", { userInSession: req.session.currentUser });
 });
 
